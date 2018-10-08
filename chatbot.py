@@ -92,3 +92,57 @@ for answer in clean_answers:
             word2count[word]= 1
         else:
             word2count[word]+=1
+
+#Creating 2 dictionary that map the question and answer rto unique integer
+threshold = 20
+questionswords2int = {}
+answerswords2int = {}
+word_number = 0
+for word,count in word2count.items():
+    if count >= threshold:
+        questionswords2int[word] = word_number
+        answerswords2int[word] = word_number
+        word_number += 1
+
+#Adding the last  2 tokens for these two dictionary
+        
+tokens = ['<PAD>','<EOS>','<OUT>','<SOS>']
+
+for token in tokens:
+    questionswords2int[token] = len(questionswords2int) + 1
+    answerswords2int[token] = len(answerswords2int) + 1
+    
+#Adding EOS token to the end of every answer
+for i in range(len(clean_answers)):
+    clean_answers[i] += ' <EOS>'
+    
+# Translating all the list of question and answer to integers and replacing all the words that are 
+# filter out by <OUT>
+questions_into_int = []
+
+for question in clean_questions:
+    ints = []
+    for word in question.split():
+        if word not in questionswords2int:
+            ints.append(questionswords2int['<OUT>'])
+        else:
+            ints.append(questionswords2int[word])
+    questions_into_int.append(ints)
+
+answers_into_int = []
+
+for answer in clean_answers:
+    ints = []
+    for word in answer.split():
+        if word not in answerswords2int:
+            ints.append(answerswords2int['<OUT>'])
+        else:
+            ints.append(answerswords2int[word])
+    answers_into_int.append(ints)
+
+
+#Sorted questions and answers by length of questions
+
+sorted_clean_questions= []
+sorted_clean_answers= []
+
